@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.madrascheck.block_extension.api.dto.req.ActiveExtensionRequest;
 import org.madrascheck.block_extension.api.dto.req.RegisterExtensionRequest;
+import org.madrascheck.block_extension.api.dto.res.CustomExtensionInfo;
 import org.madrascheck.block_extension.api.dto.res.FixedExtensionInfo;
 import org.madrascheck.block_extension.domain.entity.BlockedExtension;
 import org.madrascheck.block_extension.domain.entity.enums.ExtensionType;
@@ -56,6 +57,12 @@ public class FileExtensionManager {
                 .toList();
     }
 
+    public List<CustomExtensionInfo> getCustomExtensions() {
+        return blockedExtensionJpaRepository.findByType(ExtensionType.CUSTOM)
+                .stream()
+                .map(CustomExtensionInfo::of)
+                .toList();
+    }
 
     private void canRegisterMore() {
         if (blockedExtensionJpaRepository.findCount(ExtensionType.CUSTOM) == MAX_SIZE) {

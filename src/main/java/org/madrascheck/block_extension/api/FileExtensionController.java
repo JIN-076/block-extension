@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.madrascheck.block_extension.api.dto.req.ActiveExtensionRequest;
 import org.madrascheck.block_extension.api.dto.req.RegisterExtensionRequest;
+import org.madrascheck.block_extension.api.dto.res.CustomExtensionInfoResponse;
 import org.madrascheck.block_extension.api.dto.res.ExtensionIdResponse;
 import org.madrascheck.block_extension.api.dto.res.FixedExtensionInfoResponse;
 import org.madrascheck.block_extension.api.dto.res.FixedExtensionResponse;
@@ -61,5 +62,18 @@ public class FileExtensionController {
                 FixedExtensionInfoResponse.of(fileExtensionManager.getFixedExtensions())
         );
     }
+
+    /**
+     * 커스텀 확장자 목록을 가져오는 API
+     * @return CustomExtensionInfoResponse
+     */
+
+    @GetMapping("/custom")
+    public ResponseEntity<CustomExtensionInfoResponse> fetchCustomExtensionInfo() {
+        return ResponseEntity.ok(
+                CustomExtensionInfoResponse.of(fileExtensionManager.getCustomExtensions())
+        );
+    }
+
 
 }

@@ -1,0 +1,21 @@
+package org.madrascheck.block_extension.api.dto.res;
+
+import lombok.Getter;
+import org.madrascheck.block_extension.domain.entity.BlockedExtension;
+
+@Getter
+public class CustomExtensionInfo {
+
+    private final Long id;
+    private final String name;
+
+    private CustomExtensionInfo(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public static CustomExtensionInfo of(BlockedExtension blockedExtension) {
+        return new CustomExtensionInfo(blockedExtension.getId(), blockedExtension.getName());
+    }
+
+}
