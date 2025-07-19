@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>확장자 차단 설정</title>
+  <style>
+    .tag {
+      display: inline-block;
+      background-color: #f2f2f2;
+      border-radius: 4px;
+      padding: 5px 10px;
+      margin: 3px;
+      font-size: 14px;
+    }
+
+    .tag button {
+      background: none;
+      border: none;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div>
+  <label><strong>고정 확장자</strong></label><br>
+  <div id="fixedExtContainer"></div>
+</div>
+
+<script>
+  const fixedExtContainer = document.querySelector('#fixedExtContainer');
+
+  async function loadFixedExtensions() {
+    try {
+      const response = await fetch('/api/v1/blocked-extension/fixed');
+      const data = await response.json();
+      const list = data.extensions;
+
+      fixedExtContainer.innerHTML = '';
+      list.forEach(item => {
+        const label = document.createElement('label');
+        label.innerHTML = `
+                        <input type="checkbox" name="fixed-extension" value="${item.name}" ${item.enabled
+                                                                                             ? 'checked' : ''}>
+                        ${item.name}
+                    `;
+        fixedExtContainer.appendChild(label);
+      });
+
+      await attachFixedExtListeners();
+    } catch (err) {
+      console.error('고정 확장자 로딩 실패:', err);
+    }
+  }
+
+  function attachFixedExtListeners() {
+    document.querySelectorAll('input[name="fixed-extension"]').forEach(cb => {
+      cb.addEventListener('change', async function () {
+        const payload = {
+          isEnabled: this.checked
+        };
+
+        try {
+          const response = await fetch(`/api/v1/blocked-extension/fixed/${encodeURIComponent(this.value)}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+          })
+          if (!response.ok) {
+            console.log(data.message);
+            throw new Error(data.message);
+          }
+        } catch (err) {
+          console.error('저장 실패', err);
+          alert("저장 중 오류 발생");
+        } finally {
+          await loadFixedExtensions();
+        }
+      });
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', loadFixedExtensions);
+</script>
+
+
+<div style="margin-top: 20px;">
+  <label><strong>커스텀 확장자</strong></label><br>
+  <input id="customExtInput" placeholder="확장자 입력" type="text">
+  <button onclick="addCustomExtension()">+추가</button>
+</div>
+
+<div style="margin-top: 10px; border: 1px solid #ccc; padding: 10px; width: 400px;">
+  <div><span id="countDisplay">0</span>/200</div>
+  <div id="customExtList"></div>
+</div>
+
+<script>
+  async function loadCustomExtensions() {
+    try {
+      const response = await fetch('/api/v1/blocked-extension/custom');
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.log(data.message);
+        throw new Error(data.message);
+      }
+
+      const list = data.extensions;
+      renderCustomExtension(list);
+    } catch (err) {
+      console.error('커스텀 확장자 로딩 실패:', err);
+      alert(`에러: ${err.message}`)
+    }
+  }
+
+  async function addCustomExtension() {
+    const input = document.getElementById('customExtInput');
+    const val = input.value.trim().toLowerCase();
+
+    try {
+      const response = await fetch('/api/v1/blocked-extension/custom', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({extensionName: val})
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.log(result.message);
+        throw new Error(result.message);
+      }
+
+      input.value = '';
+    } catch (err) {
+      console.error('커스텀 확장자 추가 실패:', err);
+      alert(`에러: ${err.message}`)
+    } finally {
+      await loadCustomExtensions();
+    }
+  }
+
+  async function removeCustomExtension(val) {
+    try {
+      await fetch(`/api/v1/blocked-extension/custom/${val}`, {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'},
+      });
+    } catch (err) {
+      console.error('커스텀 확장자 삭제 실패: ', e);
+      alert("삭제 중 오류 발생");
+    } finally {
+      await loadCustomExtensions();
+    }
+  }
+
+  function renderCustomExtension(extensions) {
+    const container = document.getElementById('customExtList');
+    container.innerHTML = '';
+
+    extensions.forEach(ext => {
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.innerHTML =
+        `${ext.name} <button onclick="removeCustomExtension('${encodeURIComponent(ext.name)}')">x</button>`;
+      container.appendChild(tag);
+    });
+
+    document.getElementById('countDisplay').innerText = extensions.length;
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    loadCustomExtensions();
+  });
+</script>
+
+</body>
+</html>
