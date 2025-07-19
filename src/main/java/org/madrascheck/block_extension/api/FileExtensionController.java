@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.madrascheck.block_extension.api.dto.req.ActiveExtensionRequest;
 import org.madrascheck.block_extension.api.dto.req.RegisterExtensionRequest;
 import org.madrascheck.block_extension.api.dto.res.ExtensionIdResponse;
+import org.madrascheck.block_extension.api.dto.res.FixedExtensionInfoResponse;
 import org.madrascheck.block_extension.api.dto.res.FixedExtensionResponse;
 import org.madrascheck.block_extension.application.FileExtensionManager;
 import org.springframework.http.HttpStatus;
@@ -48,4 +49,17 @@ public class FileExtensionController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(FixedExtensionResponse.from(id, extensionName, request.getIsEnabled()));
     }
+
+    /**
+     * 고정 확장자 목록과 차단 활성화 여부를 가져오는 API
+     * @return FixedExtensionInfoResponse (200 OK)
+     */
+
+    @GetMapping("/fixed")
+    public ResponseEntity<FixedExtensionInfoResponse> fetchFixedExtensionInfo() {
+        return ResponseEntity.ok(
+                FixedExtensionInfoResponse.of(fileExtensionManager.getFixedExtensions())
+        );
+    }
+
 }

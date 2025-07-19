@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.madrascheck.block_extension.api.dto.req.ActiveExtensionRequest;
 import org.madrascheck.block_extension.api.dto.req.RegisterExtensionRequest;
+import org.madrascheck.block_extension.api.dto.res.FixedExtensionInfo;
 import org.madrascheck.block_extension.domain.entity.BlockedExtension;
 import org.madrascheck.block_extension.domain.entity.enums.ExtensionType;
 import org.madrascheck.block_extension.domain.repository.BlockedExtensionJpaRepository;
@@ -13,6 +14,8 @@ import org.madrascheck.block_extension.exception.base.IllegalStateException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.madrascheck.block_extension.exception.code.ErrorCode400.DUPLICATE_EXTENSION;
 import static org.madrascheck.block_extension.exception.code.ErrorCode400.MAX_CAPACITY_REACHED;
@@ -45,6 +48,14 @@ public class FileExtensionManager {
         origin.toggle(request.getIsEnabled());
         return origin.getId();
     }
+
+    public List<FixedExtensionInfo> getFixedExtensions() {
+        return blockedExtensionJpaRepository.findByType(ExtensionType.FIXED)
+                .stream()
+                .map(FixedExtensionInfo::of)
+                .toList();
+    }
+
 
     private void canRegisterMore() {
         if (blockedExtensionJpaRepository.findCount(ExtensionType.CUSTOM) == MAX_SIZE) {
