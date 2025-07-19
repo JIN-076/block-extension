@@ -2,15 +2,14 @@ package org.madrascheck.block_extension.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.madrascheck.block_extension.api.dto.req.ActiveExtensionRequest;
 import org.madrascheck.block_extension.api.dto.req.RegisterExtensionRequest;
 import org.madrascheck.block_extension.api.dto.res.ExtensionIdResponse;
+import org.madrascheck.block_extension.api.dto.res.FixedExtensionResponse;
 import org.madrascheck.block_extension.application.FileExtensionManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/blocked-extension")
@@ -31,5 +30,22 @@ public class FileExtensionController {
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ExtensionIdResponse.of(fileExtensionManager.register(request)));
+    }
+
+    /**
+     * 고정 확장자의 차단을 활성화/비활성화하는 API
+     * @param extensionName (활성/비활성하려는 확장자)
+     * @param request (isEnabled: 활성화할지, 비활성화할지 여부) ex) isEnabled=true -> 활성화하겠다!
+     * @return FixedExtensionResponse (200 OK)
+     */
+
+    @PatchMapping("/fixed/{extensionName}")
+    public ResponseEntity<FixedExtensionResponse> checkToFixedExtension(
+            @PathVariable String extensionName,
+            @RequestBody ActiveExtensionRequest request
+    ) {
+        Long id = fileExtensionManager.updateActivation(extensionName, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(FixedExtensionResponse.from(id, extensionName, request.getIsEnabled()));
     }
 }

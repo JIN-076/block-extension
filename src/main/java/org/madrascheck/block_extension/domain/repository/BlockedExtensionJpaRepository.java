@@ -6,9 +6,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface BlockedExtensionJpaRepository extends JpaRepository<BlockedExtension, Long> {
 
     @Query("select count(*) from BlockedExtension be where be.type = :type")
     Integer findCount(ExtensionType type);
+
+    @Query("select be from BlockedExtension be where be.type = :type and be.name = :name")
+    Optional<BlockedExtension> findByTypeAndExtension(ExtensionType type, String name);
 }
