@@ -3,6 +3,7 @@ package org.madrascheck.block_extension.domain.repository;
 import org.madrascheck.block_extension.domain.entity.BlockedExtension;
 import org.madrascheck.block_extension.domain.entity.enums.ExtensionType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -20,4 +21,8 @@ public interface BlockedExtensionJpaRepository extends JpaRepository<BlockedExte
 
     @Query("select be from BlockedExtension be where be.type = :type")
     List<BlockedExtension> findByType(ExtensionType type);
+
+    @Modifying
+    @Query("delete from BlockedExtension be where be.name = :name and be.type = 'CUSTOM'")
+    void deleteByName(String name);
 }

@@ -75,5 +75,16 @@ public class FileExtensionController {
         );
     }
 
+    /**
+     * 커스텀 확장자를 삭제하는 API
+     * @param extensionName (삭제할 확장자 이름)
+     * @return Void (204 No Content)
+     */
+
+    @DeleteMapping("/custom/{extensionName}")
+    public ResponseEntity<Void> deleteCustomExtension(@PathVariable String extensionName) {
+        fileExtensionManager.deleteCustomExtension(extensionName);
+        return ResponseEntity.noContent().build();
+    }
 
 }

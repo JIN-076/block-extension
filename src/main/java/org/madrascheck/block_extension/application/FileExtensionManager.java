@@ -64,6 +64,12 @@ public class FileExtensionManager {
                 .toList();
     }
 
+    @Transactional
+    public void deleteCustomExtension(final String extension) {
+        blockedExtensionJpaRepository.deleteByName(extension);
+    }
+
+
     private void canRegisterMore() {
         if (blockedExtensionJpaRepository.findCount(ExtensionType.CUSTOM) == MAX_SIZE) {
             throw new IllegalStateException(MAX_CAPACITY_REACHED);
