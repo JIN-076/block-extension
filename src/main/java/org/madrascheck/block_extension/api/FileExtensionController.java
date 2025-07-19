@@ -47,8 +47,7 @@ public class FileExtensionController {
             @RequestBody ActiveExtensionRequest request
     ) {
         Long id = fileExtensionManager.updateActivation(extensionName, request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(FixedExtensionResponse.from(id, extensionName, request.getIsEnabled()));
+        return ResponseEntity.ok(FixedExtensionResponse.from(id, extensionName, request.getIsEnabled()));
     }
 
     /**
